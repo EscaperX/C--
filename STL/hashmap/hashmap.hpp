@@ -1,9 +1,38 @@
 #pragma once
 
+#include <iterator>
 #include <functional>
 #include <iostream>
-template <typename K, typename V>
+
+template <typename Map, bool isConstant = true>
 class HashMap_Iterator {
+
+public:
+
+    using value_type = std::conditional_t<IsConstant, const typename Map::value_type, typename Map::value_type>;
+
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using pointer = value_type*;
+    using reference = value_type&;
+
+    friend Map;
+    friend HashMap_Iterator<Map, true>;
+    friend HashMap_Iterator<Map, false>;
+
+    // implict cast to const_iterator
+    operator HashMap_Iterator<Map, true>() const {
+        return HashMap_Iterator<Map, true>(m_bucket_array, m_node, m_bucket);
+    }
+
+private:
+    using node = typename Map::node;
+    using bucket_array_type = typename Map::bucket_array_type;
+
+    bucket_array_type* m_bucket_array;
+    node* m_node;
+    size_t m_bucket;
+
 
 };
 /**
